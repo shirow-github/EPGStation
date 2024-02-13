@@ -81,7 +81,8 @@ jobs:
           context: .
           file: Dockerfile.${{ matrix.distro }}
           platforms: ${{ matrix.platforms }}
-          tags: ${{ steps.docker-tags.outputs.tags }}
+          ## tags: ${{ steps.docker-tags.outputs.tags }}
+          tags: shirowxxx/epgstation:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           push: true
