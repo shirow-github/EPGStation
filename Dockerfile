@@ -36,9 +36,6 @@ RUN npm install --no-save --loglevel=info
 # をコピーする方法は，ファイルが追加された場合に変更する必要があるため採用しない。
 COPY . .
 RUN rm -rf client
-RUN npm config set fetch-retries 10 \
-    && npm config set fetch-retry-mintimeout 100000 \
-    && npm config set fetch-retry-maxtimeout 600000
 RUN npm run build-server --loglevel=info
 
 FROM node:18-bookworm-slim
