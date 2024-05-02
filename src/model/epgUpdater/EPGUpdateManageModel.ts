@@ -17,6 +17,7 @@ import IEPGUpdateManageModel, {
     RemoveEvent,
     RedefineEvent,
     ServiceEvent,
+    EPGUpdateEvent,
 } from './IEPGUpdateManageModel';
 
 @injectable()
@@ -208,7 +209,7 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
             throw err;
         });
 
-        this.emit('event stream started');
+        this.emit(EPGUpdateEvent.STREAM_STARTED);
 
         return new Promise<void>(async (_resolve: () => void, reject: (err: Error) => void) => {
             // エラー処理
@@ -216,7 +217,7 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
                 this.log.system.error('event stream error');
                 this.log.system.error(err);
                 this.stopStream(eventStream);
-                this.emit('event stream aborted');
+                this.emit(EPGUpdateEvent.STREAM_ABORTED);
                 reject(err);
             });
 
@@ -273,7 +274,7 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
                     }
                     this.log.system.error(err);
                     this.stopStream(eventStream);
-                    this.emit('event stream aborted');
+                    this.emit(EPGUpdateEvent.STREAM_ABORTED);
                     reject(new Error('EventStreamParseError'));
                 }
                 tmp = Buffer.from([]);
@@ -325,7 +326,9 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
             const updateIndex: { [programId: number]: ProgramBaseEvent } = {}; // 追加用索引
             let needToSave = false;
 
-            if (timeThreshold === 0) needToSave = true;
+            if (timeThreshold === 0) {
+                needToSave = true;
+            }
 
             // eventを時系列を意識して整理
             for (const event of programs) {
@@ -333,7 +336,10 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
                     const program = (<UpdateEvent>event).data;
                     if (typeof program.name !== 'undefined' && this.isMainProgram(program) === true) {
                         updateIndex[program.id] = event;
-                        if (program.startAt < timeThreshold) needToSave = true;
+                        if (program.startAt < timeThreshold) {
+                            needToSave = true;
+                        }
+
                         if (program.id in deleteIndex) {
                             // このEvent以前に受信した"remove" or "redefine" Eventは破棄する
                             delete deleteIndex[program.id];
@@ -384,7 +390,7 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
                     });
                     this.log.system.info('update program db done');
 
-                    this.emit('program updated');
+                    this.emit(EPGUpdateEvent.PROGRAM_UPDATED);
                 }
             } else {
                 // 整理した結果のEventをキューへ戻す
@@ -487,7 +493,7 @@ class EPGUpdateManageModel extends EventEmitter implements IEPGUpdateManageModel
         this.updateChannelIndex(updateValues);
 
         this.log.system.info('update channel db done');
-        this.emit('service updated');
+        this.emit(EPGUpdateEvent.SERVICE_UPDATED);
     }
 }
 

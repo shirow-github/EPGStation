@@ -756,7 +756,9 @@ class RecorderModel implements IRecorderModel {
 
                 // 録画準備中
                 this.isStopPrepRec = true;
-                if (this.abortController) this.abortController.abort();
+                if (this.abortController !== null) {
+                    this.abortController.abort();
+                }
                 this.eventEmitter.once(RecorderModel.CANCEL_EVENT, () => {
                     clearTimeout(timerId);
                     // prep rec キャンセル完了
@@ -791,6 +793,8 @@ class RecorderModel implements IRecorderModel {
         } else if (this.isRecording === true) {
             await this._cancel();
             this.isNeedDeleteReservation = false;
+        } else {
+            await this._cancel();
         }
         else {
             await this._cancel();
