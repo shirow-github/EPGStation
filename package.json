@@ -7,7 +7,7 @@
         "all-install": "npm i --no-save && cd client && npm i --no-save",
         "start": "node dist/index.js",
         "build": "npm run build-server && npm run build-client",
-        "build-server": "npm run lint",
+        "build-server": "npm run lint && npm run format && npm run compile",
         "build-client": "cd client && npm run build",
         "lint": "eslint --fix --ext .ts src/",
         "format": "prettier --check --write 'src/**/*.ts'",

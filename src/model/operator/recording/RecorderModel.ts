@@ -796,9 +796,6 @@ class RecorderModel implements IRecorderModel {
         } else {
             await this._cancel();
         }
-        else {
-            await this._cancel();
-        }
     }
 
     /**
